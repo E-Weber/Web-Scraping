@@ -67,6 +67,9 @@ def scrape():
     # Convert DF to html
     print(mars_df.to_html())
 
+    # Export to CSV
+    mars_df.to_csv('../marsData.csv', index=False)
+
     # Hemisphere
     hemi_url = "https://marshemispheres.com/"
     browser.visit(hemi_url)
