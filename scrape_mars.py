@@ -102,6 +102,8 @@ def scrape():
 
         hemi_info.append({"title": h_title, "img_url": img_url})
 
+        Mars["hemi_image"] = hemi_info
+
     return Mars
 
 
