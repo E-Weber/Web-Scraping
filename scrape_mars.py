@@ -9,14 +9,14 @@ from flask import Flask, render_template
 import time
 
 
-# def init_browser():
+def init_browser():
 
-#browser = init_browser()
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
+    browser = init_browser()
 
 
 def scrape():
-    executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=False)
 
     mars = {}
 
@@ -29,10 +29,10 @@ def scrape():
     soup = bs(news_html, 'html.parser')
 
     # News Title
-    mars['news_title'] = soup.find('div', class_='content_title').get_text()
+    Mars['news_title'] = soup.find('div', class_='content_title').get_text()
 
     # News Paragraph
-    mars['news_p'] = soup.find('div', class_='article_teaser_body').get_text()
+    Mars['news_p'] = soup.find('div', class_='article_teaser_body').get_text()
 
     # Photo
     url = 'https://spaceimages-mars.com'
@@ -44,10 +44,11 @@ def scrape():
     # Findimage
     pic_html = browser.html
     soup = bs(pic_html, 'html.parser')
-    pic_html = "/image/featured/mars"
+    pic_url = soup.find('img', class_='fancybox-image')['src']
+
     # Featured url
-    featured_image_url = url + pic_html
-    mars['featured_image_url'] = featured_image_url
+    featured_image_url = url + pic_url
+    Mars['featured_image_url'] = featured_image_url
 
     # Facts
     facts_url = 'https://galaxyfacts-mars.com'
@@ -59,21 +60,14 @@ def scrape():
 
     # Table
     mars_table = pd.read_html(facts_html)
-    mars_table
 
     # MarsDF
     mars_df = mars_table[0]
-    mars_df
 
     # Add Columns
     mars_df.columns = ["Categories", "Mars", "Earth"]
-    mars_df
 
-    # Convert DF to html
-    print(mars_df.to_html())
-
-    # Export to CSV
-    mars_df.to_csv('../marsData.csv', index=False)
+    Mars["mars_facts"] = marsData
 
     # Hemisphere
     hemi_url = "https://marshemispheres.com/"
@@ -85,7 +79,6 @@ def scrape():
 
     # Find all class_ "items"
     hemi = soup.find_all("div", class_="item")
-    hemi
 
     # Appendlist
     hemi_info = []
@@ -109,8 +102,7 @@ def scrape():
 
         hemi_info.append({"title": h_title, "img_url": img_url})
 
-    browser.quit
-    return mars
+    return Mars
 
 
 print(scrape())
