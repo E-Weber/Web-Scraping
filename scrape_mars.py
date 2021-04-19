@@ -4,33 +4,39 @@ import os
 import requests
 from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
-import pymongo
+from flask_PyMongo import PyMongo
+from flask import Flask, render_template
+import time
 
 
 def init_browser():
+
+    #browser = init_browser()
     executable_path = {'executable_path': ChromeDriverManager().install()}
     browser = Browser('chrome', **executable_path, headless=False)
 
 
 def scrape():
+
+    data = {}
+
     news_url = 'https://redplanetscience.com/'
     browser.visit(news_url)
+    time.sleep(2)
 
     # Parser
     news_html = browser.html
     soup = bs(news_html, 'html.parser')
 
     # News Title
-    news_title = soup.find('div', class_='content_title').text
-    print(news_title)
+    data['news_title'] = soup.find('div', class_='content_title').get_text
 
     # News Paragraph
-    news_p = soup.find('div', class_='article_teaser_body').text
-    print(news_p)
+    data['news_p'] = soup.find('div', class_='article_teaser_body').get_text
 
     # Photo
-    pic_url = 'https://spaceimages-mars.com'
-    browser.visit(pic_url)
+    url = 'https://spaceimages-mars.com'
+    browser.visit(url)
 
     # click
     browser.links.find_by_partial_text("FULL IMAGE").click()
@@ -38,11 +44,11 @@ def scrape():
     # Findimage
     pic_html = browser.html
     soup = bs(pic_html, 'html.parser')
-    pic_url = soup.find('img', class_='fancybox-image')['src']
+    pic_html = "/image/featured/mars"
 
     # Featured url
-    featured_image_url = pic_html + pic_url
-    featured_image_url
+    featured_image_url = url + pic_html
+    data['featured_image_url'] = featured_image_url
 
     # Facts
     facts_url = 'https://galaxyfacts-mars.com'
@@ -53,7 +59,7 @@ def scrape():
     soup = bs(facts_html, 'html.parser')
 
     # Table
-    # mars_table = pd.read_html(facts_html)
+    mars_table = pd.read_html(facts_html)
     mars_table
 
     # MarsDF
@@ -104,5 +110,8 @@ def scrape():
 
         hemi_info.append({"title": h_title, "img_url": img_url})
 
-    print(h_title)
-    print(img_url)
+    browser.quit
+    return data
+
+
+print(scrape())
