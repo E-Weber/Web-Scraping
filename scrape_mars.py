@@ -4,21 +4,21 @@ import os
 import requests
 from splinter import Browser
 from webdriver_manager.chrome import ChromeDriverManager
-from flask_PyMongo import PyMongo
+from flask_pymongo import PyMongo
 from flask import Flask, render_template
 import time
 
 
-def init_browser():
+# def init_browser():
 
-    #browser = init_browser()
-    executable_path = {'executable_path': ChromeDriverManager().install()}
-    browser = Browser('chrome', **executable_path, headless=False)
+#browser = init_browser()
 
 
 def scrape():
+    executable_path = {'executable_path': ChromeDriverManager().install()}
+    browser = Browser('chrome', **executable_path, headless=False)
 
-    data = {}
+    mars = {}
 
     news_url = 'https://redplanetscience.com/'
     browser.visit(news_url)
@@ -29,10 +29,10 @@ def scrape():
     soup = bs(news_html, 'html.parser')
 
     # News Title
-    data['news_title'] = soup.find('div', class_='content_title').get_text
+    mars['news_title'] = soup.find('div', class_='content_title').get_text()
 
     # News Paragraph
-    data['news_p'] = soup.find('div', class_='article_teaser_body').get_text
+    mars['news_p'] = soup.find('div', class_='article_teaser_body').get_text()
 
     # Photo
     url = 'https://spaceimages-mars.com'
@@ -45,10 +45,9 @@ def scrape():
     pic_html = browser.html
     soup = bs(pic_html, 'html.parser')
     pic_html = "/image/featured/mars"
-
     # Featured url
     featured_image_url = url + pic_html
-    data['featured_image_url'] = featured_image_url
+    mars['featured_image_url'] = featured_image_url
 
     # Facts
     facts_url = 'https://galaxyfacts-mars.com'
@@ -111,7 +110,7 @@ def scrape():
         hemi_info.append({"title": h_title, "img_url": img_url})
 
     browser.quit
-    return data
+    return mars
 
 
 print(scrape())
